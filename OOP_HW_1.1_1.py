@@ -1,3 +1,6 @@
+import random
+
+
 class Student:
     def __init__(self, name, surname, gender):
         self.name = name
@@ -11,13 +14,29 @@ class Student:
 
     def __str__(self):
         to_string = f'Имя: {self.name}\n' \
-              f'Фамилия: {self.surname}\n' \
-              f'Должность: студент\n' \
-              f'Оценка за домашние задания: {self.grades}\n' \
-              f'Средняя оценка за домашние задания: {self.avg_grades}\n' \
-              f'Курсы в процессе изучения: {self.courses_in_progress}\n' \
-              f'Завершенные курсы: {self.finished_courses}\n'
+                    f'Фамилия: {self.surname}\n' \
+                    f'Должность: студент\n' \
+                    f'Оценка за домашние задания: {self.grades}\n' \
+                    f'Средняя оценка за домашние задания: {self.avg_grades}\n' \
+                    f'Курсы в процессе изучения: {self.courses_in_progress}\n' \
+                    f'Завершенные курсы: {self.finished_courses}\n'
         return to_string
+
+    def avg_rate_lecturers(self, lecturers, course, grade):
+        if isinstance(lecturers, Lecturer) \
+                and course in self.courses_in_progress \
+                and course in lecturers.courses_attached:
+
+            if course in lecturers.grades:
+                lecturers.grades[course] += [grade]
+            else:
+                lecturers.grades[course] = [grade]
+
+            lecturers.avg_grades[course] = round(*list(
+                map(lambda res: sum(res) / len(lecturers.grades.get(course)),
+                    [[val for val in lecturers.grades[course]]])), 1)
+        else:
+            return 'Ошибка'
 
 
 class Mentor:
@@ -25,9 +44,8 @@ class Mentor:
         self.name = name
         self.surname = surname
         self.courses_attached = []
-        self.avg_grades = {}
 
-    def rate_hw(self, student, course, grade):
+    def avg_rate_students(self, student, course, grade):
         if isinstance(student, Student) \
                 and course in self.courses_attached \
                 and course in student.courses_in_progress:
@@ -48,13 +66,15 @@ class Lecturer(Mentor):
     def __init__(self, name, surname):
         super().__init__(name, surname)
         self.position = 'лектор'
+        self.grades = {}
+        self.avg_grades = {}
 
     def __str__(self):
         to_string = f'Имя: {self.name}\n' \
-              f'Фамилия: {self.surname}\n' \
-              f'Должность: {self.position}\n' \
-              f'Средняя оценка за лекции: {self.avg_grades}\n' \
-              f'Прикрепленные курсы: {self.courses_attached}\n'
+                    f'Фамилия: {self.surname}\n' \
+                    f'Должность: {self.position}\n' \
+                    f'Средняя оценка за лекции: {self.avg_grades}\n' \
+                    f'Прикрепленные курсы: {self.courses_attached}\n'
         return to_string
 
 
@@ -65,8 +85,8 @@ class Reviewer(Mentor):
 
     def __str__(self):
         to_string = f'Имя: {self.name}\n' \
-              f'Фамилия: {self.surname}\n' \
-              f'Должность: {self.position}\n'
+                    f'Фамилия: {self.surname}\n' \
+                    f'Должность: {self.position}\n'
         return to_string
 
 
@@ -86,7 +106,6 @@ def create_student(course_list):
                     student_dict.get(i).courses_in_progress.append(item)
         student_dict.get(i).finished_courses.append('Введение в программирование')
 
-        # print(Student.__str__(student_dict.get(i)))
     return student_dict
 
 
@@ -105,8 +124,41 @@ def create_employee(course_list, employee, course_employee):
                 if employee_dict[i].name in val:
                     employee_dict.get(i).courses_attached.append(item)
 
-        # print(employee.__str__(employee_dict.get(i)))
     return employee_dict
+
+
+def get_rates(who_rated, who_is_rated, courses):
+    for course in courses:
+        for val in range(len(who_rated)):
+            if isinstance(who_rated[val], Student):
+                if course in who_rated[val].courses_in_progress:
+                    for item in range(len(who_is_rated)):
+                        who_rated[val].avg_rate_lecturers(who_is_rated[item], course, random.randint(1, 10))
+            elif isinstance(who_rated[val], Lecturer):
+                if course in who_rated[val].courses_attached:
+                    for item in range(len(who_is_rated)):
+                        who_rated[val].avg_rate_students(who_is_rated[item], course, random.randint(1, 10))
+
+
+def avg_courses_rates(val_list, courses):
+    avg_rates = {}
+
+    for course in courses:
+        for val in val_list:
+            if val_list[val].grades.get(course) is not None:
+                for rate in val_list[val].grades.get(course):
+                    if course in avg_rates:
+                        avg_rates[course] += [rate]
+                    else:
+                        avg_rates[course] = [rate]
+        avg_rates[course] = round(sum(avg_rates[course]) / len(avg_rates[course]), 1)
+
+    return avg_rates
+
+
+def get_to_string(val_list):
+    for val in range(len(val_list)):
+        print(val_list[val])
 
 
 extension_course = ['Python', 'GIT']
@@ -144,28 +196,17 @@ course_reviewer = {extension_course[0]: [
     ]}
 
 students = create_student(extension_course)
-
 lecturer = create_employee(extension_course, Lecturer, course_lecturer)
 reviewer = create_employee(extension_course, Reviewer, course_reviewer)
 
-reviewer[0].rate_hw(students[3], extension_course[0], 10)
-reviewer[0].rate_hw(students[3], extension_course[1], 8)
-reviewer[1].rate_hw(students[3], extension_course[0], 7)
-reviewer[1].rate_hw(students[3], extension_course[1], 9)
-reviewer[2].rate_hw(students[3], extension_course[0], 9)
-reviewer[2].rate_hw(students[3], extension_course[1], 7)
+get_rates(students, lecturer, extension_course)
+get_rates(lecturer, students, extension_course)
 
-print(students[3])
+get_to_string(students)
+get_to_string(lecturer)
 
-# best_student.courses_in_progress += ['Python']
-#
-# cool_mentor = Mentor('Some', 'Buddy')
-# cool_mentor.courses_attached += ['Python']
-#
-# cool_mentor.rate_hw(best_student, 'Python', 10)
-# cool_mentor.rate_hw(best_student, 'Python', 10)
-# cool_mentor.rate_hw(best_student, 'Python', 10)
+print(f'Средняя оценка за домашние задания по всем студентам в рамках курса '
+      f'{avg_courses_rates(students, extension_course)}')
 
-# print(best_student.grades)
-# print(course_student['Python'][1])
-# print(student_py_1.name, student_py_1.surname, student_py_1.gender)
+print(f'Средняя оценка за лекции всех лекторов в рамках курса '
+      f'{avg_courses_rates(lecturer, extension_course)}')
