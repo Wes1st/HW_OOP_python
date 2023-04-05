@@ -202,11 +202,43 @@ reviewer = create_employee(extension_course, Reviewer, course_reviewer)
 get_rates(students, lecturer, extension_course)
 get_rates(lecturer, students, extension_course)
 
-get_to_string(students)
-get_to_string(lecturer)
 
-print(f'Средняя оценка за домашние задания по всем студентам в рамках курса '
-      f'{avg_courses_rates(students, extension_course)}')
+# get_to_string(students)
+# get_to_string(lecturer)
 
-print(f'Средняя оценка за лекции всех лекторов в рамках курса '
-      f'{avg_courses_rates(lecturer, extension_course)}')
+# print(f'Средняя оценка за домашние задания по всем студентам в рамках курса '
+#       f'{avg_courses_rates(students, extension_course)}')
+#
+# print(f'Средняя оценка за лекции всех лекторов в рамках курса '
+#       f'{avg_courses_rates(lecturer, extension_course)}')
+
+
+# def course_avg_rates_students(student1, student2, courses):
+#     for course in courses:
+#         if isinstance(student1, Student) and course in student1.courses_in_progress\
+#                 and isinstance(student2, Student) and course in student2.courses_in_progress:
+#             if student1.avg_grades[course].__lt__(course, student2.avg_grades[course]):
+#                 print(course, student1.avg_grades[course])
+#                 print(course, student2.avg_grades[course])
+#             # for rate in student1.avg_grades:
+#             #     print(rate)
+#
+#
+# course_avg_rates_students(students[0], students[1], extension_course)
+
+
+class Distance:
+    def __init__(self, student1, student2):
+        self.s1 = student1
+        self.s2 = student2
+
+    def __lt__(self, other):
+        return self < other
+
+
+Distance(students[0].avg_grades['Python'], students[1].avg_grades['Python'])
+print(students[0].avg_grades['Python'])
+print(students[1].avg_grades['Python'])
+print(Distance.__lt__(students[0].avg_grades['Python'], students[1].avg_grades['Python']))
+
+# print(students[0].name, students[0].avg_grades[extension_course])
