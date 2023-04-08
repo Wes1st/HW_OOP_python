@@ -38,6 +38,24 @@ class Student:
         else:
             return 'Ошибка'
 
+    def course_avg_rates_students(self, student2, courses):
+        for course in courses:
+            if isinstance(student2, Student) \
+                    and course in self.courses_in_progress \
+                    and course in student2.courses_in_progress:
+                if Comparing.__lt__(self.avg_grades[course], student2.avg_grades[course]):
+                    print(f'Средняя оценка студента на курсе {course} у '
+                          f'{self.name} {self.surname} = {self.avg_grades[course]} меньше чем у '
+                          f'{student2.name} {student2.surname} = {student2.avg_grades[course]}')
+                elif Comparing.__gt__(self.avg_grades[course], student2.avg_grades[course]):
+                    print(f'Средняя оценка студента на курсе {course} у '
+                          f'{self.name} {self.surname} = {self.avg_grades[course]} больше чем у '
+                          f'{student2.name} {student2.surname} = {student2.avg_grades[course]}')
+                elif Comparing.__eq__(self.avg_grades[course], student2.avg_grades[course]):
+                    print(f'Средняя оценка студента на курсе {course} у '
+                          f'{self.name} {self.surname} = {self.avg_grades[course]} равна оценке '
+                          f'{student2.name} {student2.surname} = {student2.avg_grades[course]}')
+
 
 class Mentor:
     def __init__(self, name, surname):
@@ -77,6 +95,24 @@ class Lecturer(Mentor):
                     f'Прикрепленные курсы: {self.courses_attached}\n'
         return to_string
 
+    def course_avg_rates_lecturers(self, lecturer2, courses):
+        for course in courses:
+            if isinstance(lecturer2, Lecturer) \
+                    and course in self.courses_attached \
+                    and course in lecturer2.courses_attached:
+                if Comparing.__lt__(self.avg_grades[course], lecturer2.avg_grades[course]):
+                    print(f'Средняя оценка лектора на курсе {course} у '
+                          f'{self.name} {self.surname} = {self.avg_grades[course]} меньше чем у '
+                          f'{lecturer2.name} {lecturer2.surname} = {lecturer2.avg_grades[course]}')
+                elif Comparing.__gt__(self.avg_grades[course], lecturer2.avg_grades[course]):
+                    print(f'Средняя оценка лектора на курсе {course} у '
+                          f'{self.name} {self.surname} = {self.avg_grades[course]} больше чем у '
+                          f'{lecturer2.name} {lecturer2.surname} = {lecturer2.avg_grades[course]}')
+                elif Comparing.__eq__(self.avg_grades[course], lecturer2.avg_grades[course]):
+                    print(f'Средняя оценка лектора на курсе {course} у '
+                          f'{self.name} {self.surname} = {self.avg_grades[course]} равна оценке '
+                          f'{lecturer2.name} {lecturer2.surname} = {lecturer2.avg_grades[course]}')
+
 
 class Reviewer(Mentor):
     def __init__(self, name, surname):
@@ -88,6 +124,17 @@ class Reviewer(Mentor):
                     f'Фамилия: {self.surname}\n' \
                     f'Должность: {self.position}\n'
         return to_string
+
+
+class Comparing:
+    def __lt__(self, other):
+        return self < other
+
+    def __gt__(self, other):
+        return self > other
+
+    def __eq__(self, other):
+        return self == other
 
 
 def create_student(course_list):
@@ -182,6 +229,7 @@ course_lecturer = {extension_course[0]: [
 ],
     extension_course[1]: [
         ['Libbey', 'Tirrey'],
+        ['Hailey', 'Donoher'],
         ['Teddy', 'Edmondson']
     ]}
 
@@ -201,44 +249,14 @@ reviewer = create_employee(extension_course, Reviewer, course_reviewer)
 
 get_rates(students, lecturer, extension_course)
 get_rates(lecturer, students, extension_course)
+get_to_string(students)
+get_to_string(lecturer)
 
+print(f'Средняя оценка за домашние задания по всем студентам в рамках курса '
+      f'{avg_courses_rates(students, extension_course)}')
 
-# get_to_string(students)
-# get_to_string(lecturer)
+print(f'Средняя оценка за лекции всех лекторов в рамках курса '
+      f'{avg_courses_rates(lecturer, extension_course)}')
 
-# print(f'Средняя оценка за домашние задания по всем студентам в рамках курса '
-#       f'{avg_courses_rates(students, extension_course)}')
-#
-# print(f'Средняя оценка за лекции всех лекторов в рамках курса '
-#       f'{avg_courses_rates(lecturer, extension_course)}')
-
-
-# def course_avg_rates_students(student1, student2, courses):
-#     for course in courses:
-#         if isinstance(student1, Student) and course in student1.courses_in_progress\
-#                 and isinstance(student2, Student) and course in student2.courses_in_progress:
-#             if student1.avg_grades[course].__lt__(course, student2.avg_grades[course]):
-#                 print(course, student1.avg_grades[course])
-#                 print(course, student2.avg_grades[course])
-#             # for rate in student1.avg_grades:
-#             #     print(rate)
-#
-#
-# course_avg_rates_students(students[0], students[1], extension_course)
-
-
-class Distance:
-    def __init__(self, student1, student2):
-        self.s1 = student1
-        self.s2 = student2
-
-    def __lt__(self, other):
-        return self < other
-
-
-Distance(students[0].avg_grades['Python'], students[1].avg_grades['Python'])
-print(students[0].avg_grades['Python'])
-print(students[1].avg_grades['Python'])
-print(Distance.__lt__(students[0].avg_grades['Python'], students[1].avg_grades['Python']))
-
-# print(students[0].name, students[0].avg_grades[extension_course])
+Student.course_avg_rates_students(students[0], students[2], extension_course)
+Lecturer.course_avg_rates_lecturers(lecturer[0], lecturer[1], extension_course)
